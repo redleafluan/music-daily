@@ -8,7 +8,7 @@
   :root {
     --bg: #0d0d0d; --card: #141414; --text: #e8e8e4; --muted: #999;
     --accent: #e87d4b; --safe: #4b9e8a; --explore: #7b6fd4; --worship: #c8a44e;
-    --border: #222;
+    --border: #222; --pink: #e87d4b;
   }
   * { margin:0; padding:0; box-sizing:border-box; }
   body {
@@ -19,19 +19,27 @@
   }
   header { padding: 16px 0 10px; text-align: center; }
   header h1 { font-size: 19px; font-weight: 700; }
-  header .date { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+  /* date switcher */
+  .date-nav { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 8px 0 16px; }
+  .date-nav .cur { font-size: 13px; color: var(--text); font-weight: 600; min-width: 140px; text-align: center; }
+  .date-nav button {
+    font-size: 11px; padding: 5px 12px; border-radius: 12px; border: 1px solid #333;
+    background: transparent; color: var(--muted); cursor: pointer;
+  }
+  .date-nav button:active { background: #222; }
+  .date-nav .today-dot { font-size: 11px; color: var(--safe); }
 
   .top-bar {
-    display: flex; gap: 8px; margin: 12px 0 18px; flex-wrap: wrap;
+    display: flex; gap: 8px; margin: 0 0 18px; flex-wrap: wrap;
   }
   .top-bar button {
-    flex: 1; min-width: 80px; padding: 12px 8px; border-radius: 14px;
+    flex: 1; min-width: 80px; padding: 11px 8px; border-radius: 14px;
     border: 1px solid #333; background: var(--card); color: var(--text);
     font-size: 13px; font-weight: 600; cursor: pointer; transition: all .12s;
   }
   .top-bar button:active { background: #222; }
-  .top-bar .btn-play-all { background: var(--safe); border-color: var(--safe); color: #fff; font-size: 15px; flex: 2; }
-  .top-bar .btn-play-all:active { opacity: .8; }
+  .top-bar .btn-play-all { background: var(--safe); border-color: var(--safe); color: #fff; font-size: 14px; flex: 2; }
   .top-bar .btn-favs { color: var(--worship); border-color: #3a3220; }
 
   .sec-title {
@@ -40,17 +48,17 @@
   }
 
   .song-row {
-    display: flex; align-items: center; gap: 10px; padding: 11px 12px;
+    display: flex; align-items: center; gap: 8px; padding: 10px 10px;
     border-bottom: 1px solid #181818; cursor: pointer; border-radius: 10px;
     transition: background .1s;
   }
   .song-row:active { background: #1a1a1a; }
-  .song-row.playing { background: #1a2520; border-left: 3px solid var(--safe); padding-left: 9px; }
+  .song-row.playing { background: #1a2520; border-left: 3px solid var(--safe); padding-left: 7px; }
   .song-row .s-num { color: var(--muted); font-size: 11px; width: 16px; text-align: center; flex-shrink: 0; }
   .song-row .s-info { flex: 1; min-width: 0; }
-  .song-row .s-header { display: flex; align-items: center; gap: 6px; }
-  .song-row .s-song { font-weight: 600; font-size: 14px; }
+  .song-row .s-song { font-weight: 600; font-size: 13px; }
   .song-row .s-artist { font-size: 11px; color: var(--muted); }
+  .song-row .s-why { font-size: 10px; color: #555; margin-top: 2px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
   .song-row .s-tag {
     font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 5px;
     white-space: nowrap; letter-spacing: .04em; flex-shrink: 0;
@@ -59,16 +67,34 @@
   .tag-edge   { background: #302820; color: var(--accent); }
   .tag-safe   { background: #1a2822; color: var(--safe); }
   .tag-worship { background: #2a2618; color: var(--worship); }
+  .tag-explore { background: #2a2230; color: #9b8fd4; }
 
-  .song-row .s-actions { display: flex; gap: 4px; flex-shrink: 0; }
+  .song-row .s-actions { display: flex; gap: 3px; flex-shrink: 0; }
   .song-row .s-actions button {
-    font-size: 11px; padding: 5px 9px; border-radius: 12px;
-    border: 1px solid #333; background: transparent; color: #666;
+    font-size: 11px; padding: 4px 8px; border-radius: 10px;
+    border: 1px solid #333; background: transparent; color: #555;
     cursor: pointer; white-space: nowrap;
   }
-  .song-row .s-actions .btn-star { color: var(--worship); border-color: #3a3220; font-size: 15px; padding: 3px 7px; }
+  .song-row .s-actions button.btn-act { color: var(--muted); }
+  .song-row .s-actions .btn-star { color: var(--worship); border-color: #3a3220; font-size: 14px; padding: 3px 6px; }
   .song-row .s-actions .btn-star.liked { background: #2a2618; border-color: var(--worship); color: var(--worship); }
-  .song-row .s-actions .btn-skip { color: #555; font-size: 13px; padding: 3px 7px; border: none; }
+  .song-row .s-actions .btn-write { color: var(--pink); border-color: #3a2828; font-size: 14px; padding: 3px 6px; }
+  .song-row .s-actions .btn-write.marked { background: #2a1a1a; border-color: var(--pink); color: var(--pink); }
+
+  /* write-list */
+  .write-item {
+    display: flex; align-items: center; gap: 8px; padding: 10px 0;
+    border-bottom: 1px solid #1c1c1c; font-size: 13px;
+  }
+  .write-item .w-num { color: var(--muted); font-size: 11px; width: 16px; }
+  .write-item .w-song { font-weight: 500; flex: 1; }
+  .write-item .w-artist { font-size: 11px; color: var(--muted); }
+  .write-item .w-badge { font-size: 10px; color: var(--pink); }
+  .write-item button {
+    font-size: 11px; padding: 4px 8px; border-radius: 10px;
+    border: 1px solid #333; background: transparent; color: var(--muted); cursor: pointer;
+  }
+  .write-item button.done-btn { color: var(--safe); border-color: #2a3a30; }
 
   /* Bottom player */
   .player-bar {
@@ -78,8 +104,7 @@
     box-shadow: 0 -4px 20px rgba(0,0,0,.5);
   }
   .player-bar .now-playing {
-    display: flex; align-items: center; gap: 10px; padding: 10px 14px;
-    font-size: 13px;
+    display: flex; align-items: center; gap: 10px; padding: 10px 14px; font-size: 13px;
   }
   .player-bar .np-info { flex: 1; min-width: 0; }
   .player-bar .np-song { font-weight: 600; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -109,14 +134,26 @@
     80% { opacity:1; }
     100% { opacity:0; }
   }
+
+  .feedback-note {
+    font-size: 11px; color: #666; margin-top: 1px; font-style: italic;
+  }
+  .fb-like { color: var(--safe); }
+  .fb-meh { color: var(--worship); }
+  .fb-dislike { color: #c95b5b; }
 </style>
 </head>
 <body>
 
 <header>
   <h1>🎧 每日音乐电台</h1>
-  <div class="date" id="todayDate"></div>
 </header>
+
+<div class="date-nav">
+  <button onclick="navDate(-1)" id="btnPrev">‹ 前一天</button>
+  <span class="cur" id="curDate">-</span>
+  <button onclick="navDate(1)" id="btnNext">后一天 ›</button>
+</div>
 
 <div class="top-bar">
   <button class="btn-play-all" onclick="playAll()">▶ 全部播放</button>
@@ -125,6 +162,7 @@
 </div>
 
 <div id="songList"></div>
+<div id="writeList"></div>
 
 <div class="player-bar" id="playerBar" style="display:none">
   <div class="now-playing">
@@ -143,144 +181,175 @@
 </div>
 
 <script>
-const TODAY = {
-  date: "2026-07-05", issue: 3,
-  regular: [
-    { id: "3-1", song: "I Was Here For a Moment", artist: "FAUZIA", tag: "doudou", tagText: "doudou方向",
-      why: "doudou/福禄寿的国际版——仪式感节奏 + 空灵女声层叠的催眠感", search: "FAUZIA Without me" },
-    { id: "3-2", song: "Desiderium", artist: "Jacqui Hunt", tag: "safe", tagText: "安全桥",
-      why: "曾是 Delerium 女声。Kate Bush × Beth Gibbons 交界——空灵合成器 + 电影感", search: "Jacqui Hunt Desiderium" },
-    { id: "3-3", song: "Anyway", artist: "HANGAWI", tag: "edge", tagText: "K-indie新线",
-      why: "K-indie 安静深夜派——闪烁合成器、细腻女声、f(x) 慢歌的氛围版", search: "HANGAWI Anyway" }
-  ],
-  worship: [
-    { id: "3-w1", song: "Walk With Me (Acoustic)", artist: "Jenn Johnson ft. Tiffany Hudson", tag: "worship", tagText: "Worship",
-      why: "Bethel 不插电版——只有钢琴和人声。极简敬拜", search: "Jenn Johnson Walk With Me Tiffany Hudson" },
-    { id: "3-w2", song: "阿爸 / Abba", artist: "約書亞樂團", tag: "worship", tagText: "Worship",
-      why: "中文敬拜里的极简温柔，和《微小的聲音》气质相通", search: "約書亞樂團 阿爸 Abba 陳州邦" }
-  ]
-};
+// =========== Archive data ===========
+const ARCHIVE = [
+  { date: "2026-07-03", issue: 1, regular: [
+    { id:"1-1", song:"Anchor", artist:"Novo Amor", tag:"explore", tagText:"试探", search:"Novo Amor Anchor", why:"空灵男声假音+层层弦乐，像世俗版崇拜音乐。" },
+    { id:"1-2", song:"Someday", artist:"Finnegan Tui", tag:"explore", tagText:"试探", search:"Finnegan Tui Someday", why:"2026新EP，雨夜氛围→弦乐膨胀。⚠️ 反馈：太吵，歇斯底里。" },
+    { id:"1-3", song:"轻轻", artist:"陈嫺静", tag:"doudou", tagText:"doudou", search:"陳嫺靜 輕輕", why:"金曲奖最佳新人，迷幻呢喃。😍 喜欢：像doudou/福禄寿。" },
+    { id:"1-4", song:"ただ君に晴れ", artist:"ヨルシカ", tag:"explore", tagText:"试探", search:"Yorushika ただ君に晴れ", why:"旋律流畅的吉他摇滚。⚠️ 反馈：日本校园乐队感。" },
+    { id:"1-5", song:"唯一", artist:"告五人", tag:"safe", tagText:"安全区", search:"告五人 唯一", why:"同名不同曲，男女声交织。😍 喜欢：告五人的天黑以后也很喜欢。" }
+  ], worship: [
+    { id:"1-w1", song:"My Refuge", artist:"Bryan & Katie Torwalt", tag:"worship", tagText:"Worship", search:"Bryan Katie Torwalt My Refuge", why:"2026年2月新发。⚠️ 反馈：旋律有重复感。" },
+    { id:"1-w2", song:"Wondrous Cross", artist:"Benjamin William Hastings", tag:"worship", tagText:"Worship", search:"Benjamin William Hastings Wondrous Cross", why:"2026新歌，三人合声。⚠️ 反馈：不喜欢。" },
+    { id:"1-w3", song:"Psalm 51", artist:"Hope Worship ft. Alyssa Conley", tag:"worship", tagText:"Worship", search:"Hope Worship Alyssa Conley Psalm 51", why:"极简编排，氛围虔诚。😍 喜欢。" }
+  ]},
+  { date: "2026-07-04", issue: 2, regular: [
+    { id:"2-1", song:"Bigger Picture", artist:"Sarah Julia", tag:"doudou", tagText:"doudou", search:"Sarah Julia Bigger Picture", why:"姐妹双人组，仪式感节奏+空灵女声交织。" },
+    { id:"2-2", song:"斋", artist:"张宇林", tag:"edge", tagText:"试探", search:"张宇林 斋 按捺", why:"豆瓣8.8分《按捺》，「中国的艺术女佛」。" },
+    { id:"2-3", song:"不是因为天气晴朗才爱你", artist:"理想混蛋", tag:"safe", tagText:"安全区", search:"理想混蛋 不是因为天气晴朗才爱你", why:"台湾男声独立，1500万播放。温暖治愈。" }
+  ], worship: [
+    { id:"2-w1", song:"It's Who You Are to Me", artist:"TB123", tag:"worship", tagText:"Worship", search:"TB123 It's Who You Are to Me", why:"极简编曲、柔软氛围。不急着推到高潮。" },
+    { id:"2-w2", song:"My Favourite Place", artist:"Fiyin Adeniyi & Jo Deep", tag:"worship", tagText:"Worship", search:"Fiyin Adeniyi My Favourite Place Jo Deep", why:"Maverick City 式不插电，唱给神。" }
+  ]},
+  { date: "2026-07-05", issue: 3, regular: [
+    { id:"3-1", song:"I Was Here For a Moment", artist:"FAUZIA", tag:"doudou", tagText:"doudou", search:"FAUZIA Without me", why:"doudou/福禄寿的国际版——仪式感节奏+空灵女声层叠的催眠感。" },
+    { id:"3-2", song:"Desiderium", artist:"Jacqui Hunt", tag:"safe", tagText:"安全桥", search:"Jacqui Hunt Desiderium", why:"曾是Delerium女声。Kate Bush×Beth Gibbons交界。" },
+    { id:"3-3", song:"Anyway", artist:"HANGAWI", tag:"edge", tagText:"K-indie新线", search:"HANGAWI Anyway", why:"K-indie安静深夜派。f(x)慢歌的氛围版。" }
+  ], worship: [
+    { id:"3-w1", song:"Walk With Me (Acoustic)", artist:"Jenn Johnson ft. Tiffany Hudson", tag:"worship", tagText:"Worship", search:"Jenn Johnson Walk With Me Acoustic Tiffany Hudson", why:"Bethel不插电——只有钢琴和人声。" },
+    { id:"3-w2", song:"阿爸 / Abba", artist:"約書亞樂團", tag:"worship", tagText:"Worship", search:"約書亞樂團 阿爸 Abba 陳州邦", why:"中文敬拜里的极简温柔。国内有源。" }
+  ]}
+];
 
-const LIKED_KEY = 'radio_liked';
-function liked() { try { return JSON.parse(localStorage.getItem(LIKED_KEY)||'[]'); } catch(e) { return []; } }
-function saveLiked(arr) { localStorage.setItem(LIKED_KEY, JSON.stringify(arr)); }
-
+// =========== State ===========
+const LIKED_KEY = 'radio_liked', WRITE_KEY = 'radio_towrite';
+let currentArchiveIdx = ARCHIVE.length - 1; // default to latest (today)
+let TODAY = ARCHIVE[currentArchiveIdx];
 let playlist = [];
 let currentIdx = -1;
-let playerOpen = false;
+
+function liked() { try { return JSON.parse(localStorage.getItem(LIKED_KEY)||'[]'); } catch(e) { return []; } }
+function saveLiked(arr) { localStorage.setItem(LIKED_KEY, JSON.stringify(arr)); }
+function toWrite() { try { return JSON.parse(localStorage.getItem(WRITE_KEY)||'[]'); } catch(e) { return []; } }
+function saveToWrite(arr) { localStorage.setItem(WRITE_KEY, JSON.stringify(arr)); }
 
 function allSongs() { return [...TODAY.regular, ...TODAY.worship]; }
 
-function playAll() {
-  playlist = allSongs().slice();
-  playIdx(0);
+function navDate(dir) {
+  const newIdx = currentArchiveIdx + dir;
+  if (newIdx < 0 || newIdx >= ARCHIVE.length) return toast(dir < 0 ? '已经是第一期了' : '已经是最新一期了');
+  currentArchiveIdx = newIdx;
+  TODAY = ARCHIVE[currentArchiveIdx];
+  playlist = []; currentIdx = -1;
+  document.getElementById('ytPlayer').src = '';
+  document.getElementById('playerBar').style.display = 'none';
+  render();
 }
-function playRandom() {
-  playlist = allSongs().slice();
-  playIdx(Math.floor(Math.random() * playlist.length));
-}
+
+// =========== Play ===========
+function playAll() { playlist = allSongs().slice(); playIdx(0); }
+function playRandom() { playlist = allSongs().slice(); playIdx(Math.floor(Math.random()*playlist.length)); }
 function playFav() {
-  const l = liked();
-  if (!l.length) return toast('还没有收藏的歌曲');
-  playlist = l.map(x => allSongs().find(s => s.id === x.id)).filter(Boolean);
-  if (!playlist.length) return toast('收藏的歌这期没有');
-  playIdx(0);
+  const l = liked(); if (!l.length) return toast('还没有收藏的歌曲');
+  playlist = l.map(x => allSongs().find(s => s.id===x.id)).filter(Boolean);
+  if (!playlist.length) return toast('收藏的歌这期没有'); playIdx(0);
 }
-function playNext() {
-  if (!playlist.length) return;
-  currentIdx = (currentIdx + 1) % playlist.length;
-  playIdx(currentIdx);
-}
+function playNext() { if (!playlist.length) return; currentIdx=(currentIdx+1)%playlist.length; playIdx(currentIdx); }
 function playIdx(idx) {
-  if (!playlist.length) return;
-  currentIdx = idx;
-  const item = playlist[idx];
-  if (!item) return;
-  // YouTube embed with search playlist — plays first result inline
-  const q = encodeURIComponent(item.search);
-  const src = `https://www.youtube.com/embed?listType=search&list=${q}&autoplay=1`;
-  document.getElementById('ytPlayer').src = src;
+  if (!playlist.length) return; currentIdx=idx; const item=playlist[idx]; if(!item) return;
+  const q=encodeURIComponent(item.search);
+  document.getElementById('ytPlayer').src=`https://www.youtube.com/embed?listType=search&list=${q}&autoplay=1`;
   document.getElementById('playerFrame').classList.add('open');
-  document.getElementById('playerBar').style.display = 'block';
-  document.getElementById('npSong').textContent = item.song;
-  document.getElementById('npArtist').textContent = item.artist;
-  // Update like button
-  const l = liked();
-  const isLiked = l.some(x => x.id === item.id);
-  const likeBtn = document.getElementById('npLike');
-  likeBtn.textContent = isLiked ? '★' : '☆';
-  likeBtn.className = 'btn-like' + (isLiked ? ' liked' : '');
-  // Scroll to song
+  document.getElementById('playerBar').style.display='block';
+  document.getElementById('npSong').textContent=item.song;
+  document.getElementById('npArtist').textContent=item.artist;
+  const l=liked(); const isLiked=l.some(x=>x.id===item.id);
+  const btn=document.getElementById('npLike'); btn.textContent=isLiked?'★':'☆';
+  btn.className='btn-like'+(isLiked?' liked':'');
   render();
-  document.getElementById('playerBar').scrollIntoView({ behavior: 'smooth' });
 }
+
 function likeCurrent() {
-  if (currentIdx < 0 || !playlist[currentIdx]) return;
-  const item = playlist[currentIdx];
-  let l = liked();
-  const exists = l.find(x => x.id === item.id);
-  if (exists) {
-    l = l.filter(x => x.id !== item.id);
-    toast('已移出收藏');
-  } else {
-    l.push({ id: item.id });
-    toast('⭐ 已收藏');
-  }
-  saveLiked(l);
-  const isLiked = l.some(x => x.id === item.id);
-  const likeBtn = document.getElementById('npLike');
-  likeBtn.textContent = isLiked ? '★' : '☆';
-  likeBtn.className = 'btn-like' + (isLiked ? ' liked' : '');
-  render();
+  if (currentIdx<0||!playlist[currentIdx]) return; const item=playlist[currentIdx];
+  let l=liked(); const exists=l.find(x=>x.id===item.id);
+  if(exists){ l=l.filter(x=>x.id!==item.id); toast('已移出收藏'); }
+  else { l.push({id:item.id}); toast('⭐ 已收藏'); }
+  saveLiked(l); const isLiked=l.some(x=>x.id===item.id);
+  const btn=document.getElementById('npLike'); btn.textContent=isLiked?'★':'☆';
+  btn.className='btn-like'+(isLiked?' liked':''); render();
 }
 function toggleLike(id) {
-  const l = liked();
-  const exists = l.find(x => x.id === id);
-  if (exists) {
-    saveLiked(l.filter(x => x.id !== id));
-  } else {
-    l.push({ id }); saveLiked(l);
-  }
+  let l=liked(); const exists=l.find(x=>x.id===id);
+  if(exists) saveLiked(l.filter(x=>x.id!==id)); else { l.push({id}); saveLiked(l); }
   render();
+}
+function toggleWrite(id) {
+  let w=toWrite(); const exists=w.find(x=>x.id===id);
+  if(exists){ w=w.filter(x=>x.id!==id); toast('已取消标记'); }
+  else {
+    const item=allSongs().find(s=>s.id===id);
+    if(item) w.push({id, song:item.song, artist:item.artist, date:TODAY.date});
+    toast('📝 已标记写文案');
+  }
+  saveToWrite(w); render();
+}
+function markDone(id) {
+  let w=toWrite(); w=w.filter(x=>x.id!==id); saveToWrite(w); toast('✅ 已完成'); render();
 }
 
 function toast(m) {
-  const d = document.createElement('div'); d.className = 'toast'; d.textContent = m;
-  document.body.appendChild(d); setTimeout(() => d.remove(), 2400);
+  const d=document.createElement('div'); d.className='toast'; d.textContent=m;
+  document.body.appendChild(d); setTimeout(()=>d.remove(),2400);
 }
 
 function render() {
-  document.getElementById('todayDate').textContent = `${TODAY.date} · 第 ${TODAY.issue} 期`;
+  const isToday = currentArchiveIdx === ARCHIVE.length - 1;
+  document.getElementById('curDate').innerHTML = `${TODAY.date} · 第 ${TODAY.issue} 期${isToday ? ' <span class="today-dot">● 今天</span>' : ''}`;
+  document.getElementById('btnPrev').style.visibility = currentArchiveIdx > 0 ? 'visible' : 'hidden';
+  document.getElementById('btnNext').style.visibility = currentArchiveIdx < ARCHIVE.length - 1 ? 'visible' : 'hidden';
 
   const all = allSongs();
   const l = liked();
+  const w = toWrite();
   let h = '';
-  h += '<div class="sec-title">今日推荐 · ' + all.length + ' 首</div>';
+  h += `<div class="sec-title">${isToday ? '今日推荐' : '推荐'} · ${all.length} 首</div>`;
   all.forEach((item, i) => {
     const isLiked = l.some(x => x.id === item.id);
+    const isWrite = w.some(x => x.id === item.id);
     const isPlaying = currentIdx >= 0 && playlist[currentIdx] && playlist[currentIdx].id === item.id;
     const tagCls = 'tag-' + item.tag;
+    // feedback hints
+    let fbNote = '';
+    if (item.why.includes('😍')) fbNote = '<span class="fb-like">喜欢</span>';
+    else if (item.why.includes('⚠️')) fbNote = '<span class="fb-dislike">有反馈</span>';
     h += `
       <div class="song-row${isPlaying ? ' playing' : ''}" onclick="playOne('${item.id}')">
         <span class="s-num">${isPlaying ? '▶' : i+1}</span>
         <span class="s-tag ${tagCls}">${item.tagText}</span>
         <div class="s-info">
-          <div class="s-header">
-            <span class="s-song">${item.song}</span>
-          </div>
-          <span class="s-artist">${item.artist}</span>
+          <div class="s-song">${item.song}${fbNote}</div>
+          <div class="s-artist">${item.artist}</div>
+          <div class="s-why">${item.why.replace(/[😍⚠️]/g,'')}</div>
         </div>
         <div class="s-actions" onclick="event.stopPropagation()">
+          <button class="btn-write${isWrite ? ' marked' : ''}" onclick="toggleWrite('${item.id}')" title="标记写文案">${isWrite ? '📝' : '✏️'}</button>
           <button class="btn-star${isLiked ? ' liked' : ''}" onclick="toggleLike('${item.id}')">${isLiked ? '★' : '☆'}</button>
         </div>
       </div>`;
   });
   document.getElementById('songList').innerHTML = h;
+
+  // Write list
+  let wh = '';
+  if (w.length) {
+    wh = '<div class="sec-title">📝 待写文案 (' + w.length + '首)</div>';
+    wh += w.map((x, i) => `
+      <div class="write-item">
+        <span class="w-num">${i+1}</span>
+        <span class="w-song">${x.song}</span>
+        <span class="w-artist">— ${x.artist}</span>
+        <span class="w-badge">第${ARCHIVE.find(a=>a.date===x.date)?.issue||'?'}期</span>
+        <button class="done-btn" onclick="markDone('${x.id}')">✓ 写完</button>
+        <button onclick="toggleWrite('${x.id}')">✕</button>
+      </div>
+    `).join('');
+  }
+  document.getElementById('writeList').innerHTML = wh;
 }
 
 window.playOne = function(id) {
-  const all = allSongs();
-  playlist = all.slice();
+  playlist = allSongs().slice();
   const idx = playlist.findIndex(s => s.id === id);
   playIdx(idx >= 0 ? idx : 0);
 };
