@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>每日音乐电台</title>
+<style>
+  :root {
+    --bg: #0d0d0d; --card: #141414; --text: #e8e8e4; --muted: #999;
+    --accent: #e87d4b; --safe: #4b9e8a; --explore: #7b6fd4; --worship: #c8a44e;
+    --border: #222;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: -apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC",sans-serif;
+    background: var(--bg); color: var(--text); max-width: 500px; margin: 0 auto;
+    padding: 14px 14px 170px; line-height: 1.5;
+    -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent;
+  }
+  header { padding: 16px 0 10px; text-align: center; }
+  header h1 { font-size: 19px; font-weight: 700; }
+  header .date { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+  .top-bar {
+    display: flex; gap: 8px; margin: 12px 0 18px; flex-wrap: wrap;
+  }
+  .top-bar button {
+    flex: 1; min-width: 80px; padding: 12px 8px; border-radius: 14px;
+    border: 1px solid #333; background: var(--card); color: var(--text);
+    font-size: 13px; font-weight: 600; cursor: pointer; transition: all .12s;
+  }
+  .top-bar button:active { background: #222; }
+  .top-bar .btn-play-all { background: var(--safe); border-color: var(--safe); color: #fff; font-size: 15px; flex: 2; }
+  .top-bar .btn-play-all:active { opacity: .8; }
+  .top-bar .btn-favs { color: var(--worship); border-color: #3a3220; }
+
+  .sec-title {
+    font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .12em;
+    color: var(--muted); margin: 20px 0 8px; padding-left: 2px;
+  }
+
+  .song-row {
+    display: flex; align-items: center; gap: 10px; padding: 11px 12px;
+    border-bottom: 1px solid #181818; cursor: pointer; border-radius: 10px;
+    transition: background .1s;
+  }
+  .song-row:active { background: #1a1a1a; }
+  .song-row.playing { background: #1a2520; border-left: 3px solid var(--safe); padding-left: 9px; }
+  .song-row .s-num { color: var(--muted); font-size: 11px; width: 16px; text-align: center; flex-shrink: 0; }
+  .song-row .s-info { flex: 1; min-width: 0; }
+  .song-row .s-header { display: flex; align-items: center; gap: 6px; }
+  .song-row .s-song { font-weight: 600; font-size: 14px; }
+  .song-row .s-artist { font-size: 11px; color: var(--muted); }
+  .song-row .s-tag {
+    font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 5px;
+    white-space: nowrap; letter-spacing: .04em; flex-shrink: 0;
+  }
+  .tag-doudou { background: #2a2540; color: var(--explore); }
+  .tag-edge   { background: #302820; color: var(--accent); }
+  .tag-safe   { background: #1a2822; color: var(--safe); }
+  .tag-worship { background: #2a2618; color: var(--worship); }
+
+  .song-row .s-actions { display: flex; gap: 4px; flex-shrink: 0; }
+  .song-row .s-actions button {
+    font-size: 11px; padding: 5px 9px; border-radius: 12px;
+    border: 1px solid #333; background: transparent; color: #666;
+    cursor: pointer; white-space: nowrap;
+  }
+  .song-row .s-actions .btn-star { color: var(--worship); border-color: #3a3220; font-size: 15px; padding: 3px 7px; }
+  .song-row .s-actions .btn-star.liked { background: #2a2618; border-color: var(--worship); color: var(--worship); }
+  .song-row .s-actions .btn-skip { color: #555; font-size: 13px; padding: 3px 7px; border: none; }
+
+  /* Bottom player */
+  .player-bar {
+    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 100%; max-width: 500px; background: #0a0a0a; border-top: 1px solid #222;
+    z-index: 100; border-radius: 16px 16px 0 0; overflow: hidden;
+    box-shadow: 0 -4px 20px rgba(0,0,0,.5);
+  }
+  .player-bar .now-playing {
+    display: flex; align-items: center; gap: 10px; padding: 10px 14px;
+    font-size: 13px;
+  }
+  .player-bar .np-info { flex: 1; min-width: 0; }
+  .player-bar .np-song { font-weight: 600; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .player-bar .np-artist { font-size: 11px; color: var(--muted); }
+  .player-bar .np-actions { display: flex; gap: 6px; flex-shrink: 0; }
+  .player-bar .np-actions button {
+    font-size: 11px; padding: 5px 10px; border-radius: 12px;
+    border: 1px solid #333; background: transparent; color: #888; cursor: pointer;
+  }
+  .player-bar .np-actions .btn-next { color: var(--safe); border-color: #2a3a30; }
+  .player-bar .np-actions .btn-like { color: var(--worship); border-color: #3a3220; }
+  .player-bar .np-actions .btn-like.liked { background: #2a2618; border-color: var(--worship); }
+
+  .player-frame { width: 100%; height: 0; transition: height .2s; background: #000; }
+  .player-frame.open { height: 260px; }
+  .player-frame iframe { width: 100%; height: 100%; border: none; }
+
+  .toast {
+    position: fixed; top: 18px; left: 50%; transform: translateX(-50%);
+    background: #444; color: #fff; padding: 10px 22px; border-radius: 20px;
+    font-size: 13px; z-index: 999; pointer-events: none;
+    animation: fio 2.3s ease;
+  }
+  @keyframes fio {
+    0% { opacity:0; transform: translateX(-50%) translateY(-8px); }
+    12% { opacity:1; transform: translateX(-50%) translateY(0); }
+    80% { opacity:1; }
+    100% { opacity:0; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🎧 每日音乐电台</h1>
+  <div class="date" id="todayDate"></div>
+</header>
+
+<div class="top-bar">
+  <button class="btn-play-all" onclick="playAll()">▶ 全部播放</button>
+  <button onclick="playRandom()">🎲 随机</button>
+  <button class="btn-favs" onclick="playFav()">⭐ 收藏</button>
+</div>
+
+<div id="songList"></div>
+
+<div class="player-bar" id="playerBar" style="display:none">
+  <div class="now-playing">
+    <div class="np-info">
+      <div class="np-song" id="npSong">-</div>
+      <div class="np-artist" id="npArtist">-</div>
+    </div>
+    <div class="np-actions">
+      <button class="btn-like" id="npLike" onclick="likeCurrent()">☆</button>
+      <button class="btn-next" onclick="playNext()">▶▶ 下一首</button>
+    </div>
+  </div>
+  <div class="player-frame open" id="playerFrame">
+    <iframe id="ytPlayer" src="" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+  </div>
+</div>
+
+<script>
+const TODAY = {
+  date: "2026-07-05", issue: 3,
+  regular: [
+    { id: "3-1", song: "I Was Here For a Moment", artist: "FAUZIA", tag: "doudou", tagText: "doudou方向",
+      why: "doudou/福禄寿的国际版——仪式感节奏 + 空灵女声层叠的催眠感", search: "FAUZIA Without me" },
+    { id: "3-2", song: "Desiderium", artist: "Jacqui Hunt", tag: "safe", tagText: "安全桥",
+      why: "曾是 Delerium 女声。Kate Bush × Beth Gibbons 交界——空灵合成器 + 电影感", search: "Jacqui Hunt Desiderium" },
+    { id: "3-3", song: "Anyway", artist: "HANGAWI", tag: "edge", tagText: "K-indie新线",
+      why: "K-indie 安静深夜派——闪烁合成器、细腻女声、f(x) 慢歌的氛围版", search: "HANGAWI Anyway" }
+  ],
+  worship: [
+    { id: "3-w1", song: "Walk With Me (Acoustic)", artist: "Jenn Johnson ft. Tiffany Hudson", tag: "worship", tagText: "Worship",
+      why: "Bethel 不插电版——只有钢琴和人声。极简敬拜", search: "Jenn Johnson Walk With Me Tiffany Hudson" },
+    { id: "3-w2", song: "阿爸 / Abba", artist: "約書亞樂團", tag: "worship", tagText: "Worship",
+      why: "中文敬拜里的极简温柔，和《微小的聲音》气质相通", search: "約書亞樂團 阿爸 Abba 陳州邦" }
+  ]
+};
+
+const LIKED_KEY = 'radio_liked';
+function liked() { try { return JSON.parse(localStorage.getItem(LIKED_KEY)||'[]'); } catch(e) { return []; } }
+function saveLiked(arr) { localStorage.setItem(LIKED_KEY, JSON.stringify(arr)); }
+
+let playlist = [];
+let currentIdx = -1;
+let playerOpen = false;
+
+function allSongs() { return [...TODAY.regular, ...TODAY.worship]; }
+
+function playAll() {
+  playlist = allSongs().slice();
+  playIdx(0);
+}
+function playRandom() {
+  playlist = allSongs().slice();
+  playIdx(Math.floor(Math.random() * playlist.length));
+}
+function playFav() {
+  const l = liked();
+  if (!l.length) return toast('还没有收藏的歌曲');
+  playlist = l.map(x => allSongs().find(s => s.id === x.id)).filter(Boolean);
+  if (!playlist.length) return toast('收藏的歌这期没有');
+  playIdx(0);
+}
+function playNext() {
+  if (!playlist.length) return;
+  currentIdx = (currentIdx + 1) % playlist.length;
+  playIdx(currentIdx);
+}
+function playIdx(idx) {
+  if (!playlist.length) return;
+  currentIdx = idx;
+  const item = playlist[idx];
+  if (!item) return;
+  // YouTube embed with search playlist — plays first result inline
+  const q = encodeURIComponent(item.search);
+  const src = `https://www.youtube.com/embed?listType=search&list=${q}&autoplay=1`;
+  document.getElementById('ytPlayer').src = src;
+  document.getElementById('playerFrame').classList.add('open');
+  document.getElementById('playerBar').style.display = 'block';
+  document.getElementById('npSong').textContent = item.song;
+  document.getElementById('npArtist').textContent = item.artist;
+  // Update like button
+  const l = liked();
+  const isLiked = l.some(x => x.id === item.id);
+  const likeBtn = document.getElementById('npLike');
+  likeBtn.textContent = isLiked ? '★' : '☆';
+  likeBtn.className = 'btn-like' + (isLiked ? ' liked' : '');
+  // Scroll to song
+  render();
+  document.getElementById('playerBar').scrollIntoView({ behavior: 'smooth' });
+}
+function likeCurrent() {
+  if (currentIdx < 0 || !playlist[currentIdx]) return;
+  const item = playlist[currentIdx];
+  let l = liked();
+  const exists = l.find(x => x.id === item.id);
+  if (exists) {
+    l = l.filter(x => x.id !== item.id);
+    toast('已移出收藏');
+  } else {
+    l.push({ id: item.id });
+    toast('⭐ 已收藏');
+  }
+  saveLiked(l);
+  const isLiked = l.some(x => x.id === item.id);
+  const likeBtn = document.getElementById('npLike');
+  likeBtn.textContent = isLiked ? '★' : '☆';
+  likeBtn.className = 'btn-like' + (isLiked ? ' liked' : '');
+  render();
+}
+function toggleLike(id) {
+  const l = liked();
+  const exists = l.find(x => x.id === id);
+  if (exists) {
+    saveLiked(l.filter(x => x.id !== id));
+  } else {
+    l.push({ id }); saveLiked(l);
+  }
+  render();
+}
+
+function toast(m) {
+  const d = document.createElement('div'); d.className = 'toast'; d.textContent = m;
+  document.body.appendChild(d); setTimeout(() => d.remove(), 2400);
+}
+
+function render() {
+  document.getElementById('todayDate').textContent = `${TODAY.date} · 第 ${TODAY.issue} 期`;
+
+  const all = allSongs();
+  const l = liked();
+  let h = '';
+  h += '<div class="sec-title">今日推荐 · ' + all.length + ' 首</div>';
+  all.forEach((item, i) => {
+    const isLiked = l.some(x => x.id === item.id);
+    const isPlaying = currentIdx >= 0 && playlist[currentIdx] && playlist[currentIdx].id === item.id;
+    const tagCls = 'tag-' + item.tag;
+    h += `
+      <div class="song-row${isPlaying ? ' playing' : ''}" onclick="playOne('${item.id}')">
+        <span class="s-num">${isPlaying ? '▶' : i+1}</span>
+        <span class="s-tag ${tagCls}">${item.tagText}</span>
+        <div class="s-info">
+          <div class="s-header">
+            <span class="s-song">${item.song}</span>
+          </div>
+          <span class="s-artist">${item.artist}</span>
+        </div>
+        <div class="s-actions" onclick="event.stopPropagation()">
+          <button class="btn-star${isLiked ? ' liked' : ''}" onclick="toggleLike('${item.id}')">${isLiked ? '★' : '☆'}</button>
+        </div>
+      </div>`;
+  });
+  document.getElementById('songList').innerHTML = h;
+}
+
+window.playOne = function(id) {
+  const all = allSongs();
+  playlist = all.slice();
+  const idx = playlist.findIndex(s => s.id === id);
+  playIdx(idx >= 0 ? idx : 0);
+};
+
+render();
+</script>
+</body>
+</html>
