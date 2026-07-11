@@ -14,13 +14,12 @@
   body {
     font-family: -apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC",sans-serif;
     background: var(--bg); color: var(--text); max-width: 500px; margin: 0 auto;
-    padding: 14px 14px 170px; line-height: 1.5;
+    padding: 14px 14px 100px; line-height: 1.5;
     -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent;
   }
   header { padding: 16px 0 10px; text-align: center; }
   header h1 { font-size: 19px; font-weight: 700; }
 
-  /* date switcher */
   .date-nav { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 8px 0 16px; }
   .date-nav .cur { font-size: 13px; color: var(--text); font-weight: 600; min-width: 140px; text-align: center; }
   .date-nav button {
@@ -75,13 +74,14 @@
     border: 1px solid #333; background: transparent; color: #555;
     cursor: pointer; white-space: nowrap;
   }
-  .song-row .s-actions button.btn-act { color: var(--muted); }
   .song-row .s-actions .btn-star { color: var(--worship); border-color: #3a3220; font-size: 14px; padding: 3px 6px; }
   .song-row .s-actions .btn-star.liked { background: #2a2618; border-color: var(--worship); color: var(--worship); }
   .song-row .s-actions .btn-write { color: var(--pink); border-color: #3a2828; font-size: 14px; padding: 3px 6px; }
   .song-row .s-actions .btn-write.marked { background: #2a1a1a; border-color: var(--pink); color: var(--pink); }
+  .song-row .s-actions .btn-listen {
+    color: var(--safe); border-color: #2a3a30; font-size: 10px; padding: 2px 6px;
+  }
 
-  /* write-list */
   .write-item {
     display: flex; align-items: center; gap: 8px; padding: 10px 0;
     border-bottom: 1px solid #1c1c1c; font-size: 13px;
@@ -100,7 +100,7 @@
   .player-bar {
     position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
     width: 100%; max-width: 500px; background: #0a0a0a; border-top: 1px solid #222;
-    z-index: 100; border-radius: 16px 16px 0 0; overflow: hidden;
+    z-index: 100; border-radius: 16px 16px 0 0;
     box-shadow: 0 -4px 20px rgba(0,0,0,.5);
   }
   .player-bar .now-playing {
@@ -117,10 +117,6 @@
   .player-bar .np-actions .btn-next { color: var(--safe); border-color: #2a3a30; }
   .player-bar .np-actions .btn-like { color: var(--worship); border-color: #3a3220; }
   .player-bar .np-actions .btn-like.liked { background: #2a2618; border-color: var(--worship); }
-
-  .player-frame { width: 100%; height: 0; transition: height .2s; background: #000; }
-  .player-frame.open { height: 260px; }
-  .player-frame iframe { width: 100%; height: 100%; border: none; }
 
   .toast {
     position: fixed; top: 18px; left: 50%; transform: translateX(-50%);
@@ -139,8 +135,14 @@
     font-size: 11px; color: #666; margin-top: 1px; font-style: italic;
   }
   .fb-like { color: var(--safe); }
-  .fb-meh { color: var(--worship); }
   .fb-dislike { color: #c95b5b; }
+
+  .platform-badge {
+    font-size: 8px; font-weight: 600; padding: 1px 5px; border-radius: 4px;
+    margin-left: 4px; vertical-align: middle;
+  }
+  .platform-yt { background: #301010; color: #e84b4b; }
+  .platform-cn { background: #103020; color: #4b9e8a; }
 </style>
 </head>
 <body>
@@ -175,46 +177,60 @@
       <button class="btn-next" onclick="playNext()">▶▶ 下一首</button>
     </div>
   </div>
-  <div class="player-frame open" id="playerFrame">
-    <iframe id="ytPlayer" src="" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-  </div>
 </div>
 
 <script>
 // =========== Archive data ===========
 const ARCHIVE = [
   { date: "2026-07-03", issue: 1, regular: [
-    { id:"1-1", song:"Anchor", artist:"Novo Amor", tag:"explore", tagText:"试探", search:"Novo Amor Anchor", why:"空灵男声假音+层层弦乐，像世俗版崇拜音乐。" },
-    { id:"1-2", song:"Someday", artist:"Finnegan Tui", tag:"explore", tagText:"试探", search:"Finnegan Tui Someday", why:"2026新EP，雨夜氛围→弦乐膨胀。⚠️ 反馈：太吵，歇斯底里。" },
-    { id:"1-3", song:"轻轻", artist:"陈嫺静", tag:"doudou", tagText:"doudou", search:"陳嫺靜 輕輕", why:"金曲奖最佳新人，迷幻呢喃。😍 喜欢：像doudou/福禄寿。" },
-    { id:"1-4", song:"ただ君に晴れ", artist:"ヨルシカ", tag:"explore", tagText:"试探", search:"Yorushika ただ君に晴れ", why:"旋律流畅的吉他摇滚。⚠️ 反馈：日本校园乐队感。" },
-    { id:"1-5", song:"唯一", artist:"告五人", tag:"safe", tagText:"安全区", search:"告五人 唯一", why:"同名不同曲，男女声交织。😍 喜欢：告五人的天黑以后也很喜欢。" }
+    { id:"1-1", song:"Anchor", artist:"Novo Amor", tag:"explore", tagText:"试探", search:"Novo Amor Anchor", platform:"yt", why:"空灵男声假音+层层弦乐，像世俗版崇拜音乐。" },
+    { id:"1-2", song:"Someday", artist:"Finnegan Tui", tag:"explore", tagText:"试探", search:"Finnegan Tui Someday", platform:"yt", why:"2026新EP，雨夜氛围→弦乐膨胀。⚠️ 反馈：太吵，歇斯底里。" },
+    { id:"1-3", song:"轻轻", artist:"陈嫺静", tag:"doudou", tagText:"doudou", search:"陳嫺靜 輕輕", platform:"cn", why:"金曲奖最佳新人，迷幻呢喃。😍 喜欢：像doudou/福禄寿。" },
+    { id:"1-4", song:"ただ君に晴れ", artist:"ヨルシカ", tag:"explore", tagText:"试探", search:"Yorushika ただ君に晴れ", platform:"yt", why:"旋律流畅的吉他摇滚。⚠️ 反馈：日本校园乐队感。" },
+    { id:"1-5", song:"唯一", artist:"告五人", tag:"safe", tagText:"安全区", search:"告五人 唯一", platform:"cn", why:"同名不同曲，男女声交织。😍 喜欢：告五人的天黑以后也很喜欢。" }
   ], worship: [
-    { id:"1-w1", song:"My Refuge", artist:"Bryan & Katie Torwalt", tag:"worship", tagText:"Worship", search:"Bryan Katie Torwalt My Refuge", why:"2026年2月新发。⚠️ 反馈：旋律有重复感。" },
-    { id:"1-w2", song:"Wondrous Cross", artist:"Benjamin William Hastings", tag:"worship", tagText:"Worship", search:"Benjamin William Hastings Wondrous Cross", why:"2026新歌，三人合声。⚠️ 反馈：不喜欢。" },
-    { id:"1-w3", song:"Psalm 51", artist:"Hope Worship ft. Alyssa Conley", tag:"worship", tagText:"Worship", search:"Hope Worship Alyssa Conley Psalm 51", why:"极简编排，氛围虔诚。😍 喜欢。" }
+    { id:"1-w1", song:"My Refuge", artist:"Bryan & Katie Torwalt", tag:"worship", tagText:"Worship", search:"Bryan Katie Torwalt My Refuge", platform:"yt", why:"2026年2月新发。⚠️ 反馈：旋律有重复感。" },
+    { id:"1-w2", song:"Wondrous Cross", artist:"Benjamin William Hastings", tag:"worship", tagText:"Worship", search:"Benjamin William Hastings Wondrous Cross", platform:"yt", why:"2026新歌，三人合声。⚠️ 反馈：不喜欢。" },
+    { id:"1-w3", song:"Psalm 51", artist:"Hope Worship ft. Alyssa Conley", tag:"worship", tagText:"Worship", search:"Hope Worship Alyssa Conley Psalm 51", platform:"yt", why:"极简编排，氛围虔诚。😍 喜欢。" }
   ]},
   { date: "2026-07-04", issue: 2, regular: [
-    { id:"2-1", song:"Bigger Picture", artist:"Sarah Julia", tag:"doudou", tagText:"doudou", search:"Sarah Julia Bigger Picture", why:"姐妹双人组，仪式感节奏+空灵女声交织。" },
-    { id:"2-2", song:"斋", artist:"张宇林", tag:"edge", tagText:"试探", search:"张宇林 斋 按捺", why:"豆瓣8.8分《按捺》，「中国的艺术女佛」。" },
-    { id:"2-3", song:"不是因为天气晴朗才爱你", artist:"理想混蛋", tag:"safe", tagText:"安全区", search:"理想混蛋 不是因为天气晴朗才爱你", why:"台湾男声独立，1500万播放。温暖治愈。" }
+    { id:"2-1", song:"Bigger Picture", artist:"Sarah Julia", tag:"doudou", tagText:"doudou", search:"Sarah Julia Bigger Picture", platform:"yt", why:"姐妹双人组，仪式感节奏+空灵女声交织。" },
+    { id:"2-2", song:"斋", artist:"张宇林", tag:"edge", tagText:"试探", search:"张宇林 斋 按捺", platform:"cn", why:"豆瓣8.8分《按捺》，「中国的艺术女佛」。" },
+    { id:"2-3", song:"不是因为天气晴朗才爱你", artist:"理想混蛋", tag:"safe", tagText:"安全区", search:"理想混蛋 不是因为天气晴朗才爱你", platform:"cn", why:"台湾男声独立，1500万播放。温暖治愈。" }
   ], worship: [
-    { id:"2-w1", song:"It's Who You Are to Me", artist:"TB123", tag:"worship", tagText:"Worship", search:"TB123 It's Who You Are to Me", why:"极简编曲、柔软氛围。不急着推到高潮。" },
-    { id:"2-w2", song:"My Favourite Place", artist:"Fiyin Adeniyi & Jo Deep", tag:"worship", tagText:"Worship", search:"Fiyin Adeniyi My Favourite Place Jo Deep", why:"Maverick City 式不插电，唱给神。" }
+    { id:"2-w1", song:"It's Who You Are to Me", artist:"TB123", tag:"worship", tagText:"Worship", search:"TB123 It's Who You Are to Me", platform:"yt", why:"极简编曲、柔软氛围。不急着推到高潮。" },
+    { id:"2-w2", song:"My Favourite Place", artist:"Fiyin Adeniyi & Jo Deep", tag:"worship", tagText:"Worship", search:"Fiyin Adeniyi My Favourite Place Jo Deep", platform:"yt", why:"Maverick City 式不插电，唱给神。" }
   ]},
   { date: "2026-07-05", issue: 3, regular: [
-    { id:"3-1", song:"I Was Here For a Moment", artist:"FAUZIA", tag:"doudou", tagText:"doudou", search:"FAUZIA Without me", why:"doudou/福禄寿的国际版——仪式感节奏+空灵女声层叠的催眠感。" },
-    { id:"3-2", song:"Desiderium", artist:"Jacqui Hunt", tag:"safe", tagText:"安全桥", search:"Jacqui Hunt Desiderium", why:"曾是Delerium女声。Kate Bush×Beth Gibbons交界。" },
-    { id:"3-3", song:"Anyway", artist:"HANGAWI", tag:"edge", tagText:"K-indie新线", search:"HANGAWI Anyway", why:"K-indie安静深夜派。f(x)慢歌的氛围版。" }
+    { id:"3-1", song:"I Was Here For a Moment", artist:"FAUZIA", tag:"doudou", tagText:"doudou", search:"FAUZIA Without me", platform:"yt", why:"doudou/福禄寿的国际版——仪式感节奏+空灵女声层叠的催眠感。" },
+    { id:"3-2", song:"Desiderium", artist:"Jacqui Hunt", tag:"safe", tagText:"安全桥", search:"Jacqui Hunt Desiderium", platform:"yt", why:"曾是Delerium女声。Kate Bush×Beth Gibbons交界。" },
+    { id:"3-3", song:"Anyway", artist:"HANGAWI", tag:"edge", tagText:"K-indie新线", search:"HANGAWI Anyway", platform:"yt", why:"K-indie安静深夜派。f(x)慢歌的氛围版。" }
   ], worship: [
-    { id:"3-w1", song:"Walk With Me (Acoustic)", artist:"Jenn Johnson ft. Tiffany Hudson", tag:"worship", tagText:"Worship", search:"Jenn Johnson Walk With Me Acoustic Tiffany Hudson", why:"Bethel不插电——只有钢琴和人声。" },
-    { id:"3-w2", song:"阿爸 / Abba", artist:"約書亞樂團", tag:"worship", tagText:"Worship", search:"約書亞樂團 阿爸 Abba 陳州邦", why:"中文敬拜里的极简温柔。国内有源。" }
+    { id:"3-w1", song:"Walk With Me (Acoustic)", artist:"Jenn Johnson ft. Tiffany Hudson", tag:"worship", tagText:"Worship", search:"Jenn Johnson Walk With Me Acoustic Tiffany Hudson", platform:"yt", why:"Bethel不插电——只有钢琴和人声。" },
+    { id:"3-w2", song:"阿爸 / Abba", artist:"約書亞樂團", tag:"worship", tagText:"Worship", search:"約書亞樂團 阿爸 Abba 陳州邦", platform:"cn", why:"中文敬拜里的极简温柔。国内有源。" }
+  ]},
+  { date: "2026-07-11", issue: 5, regular: [
+    { id:"5-1", song:"我要去看美丽的风景", artist:"谢春花", tag:"safe", tagText:"安全区", search:"谢春花 我要去看美丽的风景", platform:"cn", why:"7/2新EP《出发！》，干净纯粹女声+山野辽阔感。治愈不累，国内全平台可播。" },
+    { id:"5-2", song:"寂寞是什么", artist:"陈嫺静 ft. 马念先", tag:"doudou", tagText:"doudou方向", search:"陳嫺靜 馬念先 寂寞是什麼", platform:"cn", why:"第1期最爱「轻轻」的新作——6/6发行。慵懒魔幻声线×city pop复古感。B站可听。" },
+    { id:"5-3", song:"千山后", artist:"黄雅莉", tag:"safe", tagText:"安全区", search:"黄雅莉 千山后", platform:"cn", why:"7/9全新单曲。温暖女声×民谣流行。TME平台可播。" }
+  ], worship: [
+    { id:"5-w1", song:"You Restore My Soul (Acoustic)", artist:"New Wine Worship ft. Lauren Harris", tag:"worship", tagText:"Worship", search:"New Wine Worship You Restore My Soul Acoustic Lauren Harris", platform:"yt", why:"7/3新发，诗篇23篇不插电版。只有钢琴和人声。极简虔诚，和Psalm 51同一条路。" },
+    { id:"5-w2", song:"不再有黑夜", artist:"約書亞樂團", tag:"worship", tagText:"Worship", search:"約書亞樂團 不再有黑夜 陳雅玲", platform:"cn", why:"2026最新单曲中韩双版。延续《微小的聲音》《阿爸》的温柔线。国内可播。" }
+  ]},
+  { date: "2026-07-08", issue: 4, regular: [
+    { id:"4-1", song:"Sing To", artist:"Emily A. Sprague", tag:"doudou", tagText:"doudou", search:"Emily A Sprague Sing To", platform:"yt", why:"Florist主唱首次加入人声。全合成器编织，声像水底植物在发光。极简重复中的仪式感催眠。7月6日新发。" },
+    { id:"4-2", song:"vertigo", artist:"Gaya Yona", tag:"doudou", tagText:"doudou", search:"Gaya Yona vertigo", platform:"yt", why:"梦幻流行+民谣，电影感女声+弦乐。友情变爱情那一刻的眩晕。有《诀爱》式的弦乐骨架但极克制。7月6日新发。" },
+    { id:"4-3", song:"春来 In Bloom", artist:"李语庭", tag:"safe", tagText:"安全区", search:"李语庭 春来 In Bloom", platform:"cn", why:"00后独立女声。鸟鸣水流长笛采样+松弛声线。治愈不累，国内平台能播。" },
+    { id:"4-4", song:"Crazy", artist:"GERD", tag:"edge", tagText:"北欧新线", search:"GERD Crazy", platform:"yt", why:"瑞典梦幻流行新星。钢琴起手→层层合成器铺开，空灵声线。北欧式克制+梦幻光泽。试探北欧线。7月4日新发。" }
+  ], worship: [
+    { id:"4-w1", song:"The Lord Will Perfect", artist:"Zoi Love", tag:"worship", tagText:"Worship", search:"Zoi Love The Lord Will Perfect", platform:"yt", why:"7月4日新发。极简钢琴+女声，诗篇138:8。一个人坐在钢琴前的祷告。和Psalm 51同一条路。" },
+    { id:"4-w2", song:"Costly Worship", artist:"Philippa Hanna", tag:"worship", tagText:"Worship", search:"Philippa Hanna Costly Worship", platform:"yt", why:"钢琴+原声吉他。「付代价的敬拜」——歌名就是态度。弦乐叠加克制有层次，没有公式化build-up。" }
   ]}
 ];
 
 // =========== State ===========
 const LIKED_KEY = 'radio_liked', WRITE_KEY = 'radio_towrite';
-let currentArchiveIdx = ARCHIVE.length - 1; // default to latest (today)
+let currentArchiveIdx = ARCHIVE.length - 1;
 let TODAY = ARCHIVE[currentArchiveIdx];
 let playlist = [];
 let currentIdx = -1;
@@ -226,13 +242,20 @@ function saveToWrite(arr) { localStorage.setItem(WRITE_KEY, JSON.stringify(arr))
 
 function allSongs() { return [...TODAY.regular, ...TODAY.worship]; }
 
+function getSearchUrl(item) {
+  const q = encodeURIComponent(item.search);
+  if (item.platform === 'cn') return `https://music.163.com/#/search/m/?s=${q}`;
+  return `https://www.youtube.com/results?search_query=${q}`;
+}
+
+function platformLabel(p) { return p === 'cn' ? '网易云' : 'YouTube'; }
+
 function navDate(dir) {
   const newIdx = currentArchiveIdx + dir;
   if (newIdx < 0 || newIdx >= ARCHIVE.length) return toast(dir < 0 ? '已经是第一期了' : '已经是最新一期了');
   currentArchiveIdx = newIdx;
   TODAY = ARCHIVE[currentArchiveIdx];
   playlist = []; currentIdx = -1;
-  document.getElementById('ytPlayer').src = '';
   document.getElementById('playerBar').style.display = 'none';
   render();
 }
@@ -245,18 +268,34 @@ function playFav() {
   playlist = l.map(x => allSongs().find(s => s.id===x.id)).filter(Boolean);
   if (!playlist.length) return toast('收藏的歌这期没有'); playIdx(0);
 }
-function playNext() { if (!playlist.length) return; currentIdx=(currentIdx+1)%playlist.length; playIdx(currentIdx); }
+function playNext() {
+  if (!playlist.length) return;
+  currentIdx=(currentIdx+1)%playlist.length;
+  playIdx(currentIdx);
+}
 function playIdx(idx) {
-  if (!playlist.length) return; currentIdx=idx; const item=playlist[idx]; if(!item) return;
-  const q=encodeURIComponent(item.search);
-  document.getElementById('ytPlayer').src=`https://www.youtube.com/embed?listType=search&list=${q}&autoplay=1`;
-  document.getElementById('playerFrame').classList.add('open');
+  if (!playlist.length) return;
+  currentIdx=idx;
+  const item=playlist[idx];
+  if(!item) return;
+
+  // Open search in new tab
+  const url = getSearchUrl(item);
+  const features = 'noopener';
+  if (item.platform === 'cn') {
+    window.open(url, '_blank', features);
+  } else {
+    window.open(url, `yt_${item.id}`, features);
+  }
+
+  // Update bottom bar
   document.getElementById('playerBar').style.display='block';
   document.getElementById('npSong').textContent=item.song;
-  document.getElementById('npArtist').textContent=item.artist;
+  document.getElementById('npArtist').textContent=`${item.artist} · ${platformLabel(item.platform)}`;
   const l=liked(); const isLiked=l.some(x=>x.id===item.id);
   const btn=document.getElementById('npLike'); btn.textContent=isLiked?'★':'☆';
   btn.className='btn-like'+(isLiked?' liked':'');
+  toast(`🎵 在新标签页打开 ${platformLabel(item.platform)} 搜索`);
   render();
 }
 
@@ -293,6 +332,10 @@ function toast(m) {
   document.body.appendChild(d); setTimeout(()=>d.remove(),2400);
 }
 
+function openSong(item) {
+  window.open(getSearchUrl(item), item.platform === 'cn' ? '_blank' : `yt_${item.id}`, 'noopener');
+}
+
 function render() {
   const isToday = currentArchiveIdx === ARCHIVE.length - 1;
   document.getElementById('curDate').innerHTML = `${TODAY.date} · 第 ${TODAY.issue} 期${isToday ? ' <span class="today-dot">● 今天</span>' : ''}`;
@@ -309,7 +352,8 @@ function render() {
     const isWrite = w.some(x => x.id === item.id);
     const isPlaying = currentIdx >= 0 && playlist[currentIdx] && playlist[currentIdx].id === item.id;
     const tagCls = 'tag-' + item.tag;
-    // feedback hints
+    const pCls = item.platform === 'cn' ? 'platform-cn' : 'platform-yt';
+    const pLabel = platformLabel(item.platform);
     let fbNote = '';
     if (item.why.includes('😍')) fbNote = '<span class="fb-like">喜欢</span>';
     else if (item.why.includes('⚠️')) fbNote = '<span class="fb-dislike">有反馈</span>';
@@ -318,11 +362,12 @@ function render() {
         <span class="s-num">${isPlaying ? '▶' : i+1}</span>
         <span class="s-tag ${tagCls}">${item.tagText}</span>
         <div class="s-info">
-          <div class="s-song">${item.song}${fbNote}</div>
+          <div class="s-song">${item.song}<span class="platform-badge ${pCls}">${pLabel}</span>${fbNote}</div>
           <div class="s-artist">${item.artist}</div>
           <div class="s-why">${item.why.replace(/[😍⚠️]/g,'')}</div>
         </div>
         <div class="s-actions" onclick="event.stopPropagation()">
+          <button class="btn-listen" onclick="openSong(allSongs()[${i}])" title="在${pLabel}搜索">▶</button>
           <button class="btn-write${isWrite ? ' marked' : ''}" onclick="toggleWrite('${item.id}')" title="标记写文案">${isWrite ? '📝' : '✏️'}</button>
           <button class="btn-star${isLiked ? ' liked' : ''}" onclick="toggleLike('${item.id}')">${isLiked ? '★' : '☆'}</button>
         </div>
@@ -330,7 +375,6 @@ function render() {
   });
   document.getElementById('songList').innerHTML = h;
 
-  // Write list
   let wh = '';
   if (w.length) {
     wh = '<div class="sec-title">📝 待写文案 (' + w.length + '首)</div>';
