@@ -299,5 +299,58 @@
         "search": "約書亞樂團 不再有黑夜 陳雅玲"
       }
     ]
+  },
+  {
+    "date": "2026-07-12",
+    "issue": 6,
+    "regular": [
+      {
+        "id": "6-1",
+        "song": "还有人在",
+        "artist": "陈珊妮",
+        "tag": "safe",
+        "tagText": "安全区",
+        "why": "7/3新单曲，网易云独家。台湾独立女声标志人物，那卡西曲风包裹空灵感——不急着高潮，像深夜巷子里远远传来的歌声。国内可播。",
+        "search": "陈珊妮 还有人在"
+      },
+      {
+        "id": "6-2",
+        "song": "close your eyes",
+        "artist": "she's green",
+        "tag": "doudou",
+        "tagText": "doudou方向",
+        "why": "7/10新EP《swallowtail》，Minneapolis dream pop/shoegaze。被比作Cocteau Twins×Slowdive——层层吉他音墙+空灵女声，有doudou那种沉浸仪式感但更西式。",
+        "search": "she's green close your eyes swallowtail"
+      },
+      {
+        "id": "6-3",
+        "song": "Desire",
+        "artist": "Morgara",
+        "tag": "edge",
+        "tagText": "异域新线",
+        "why": "多伦多新人首单（6月），alt-folk×dream pop，被比作Florence+the Machine——温暖声线+电影感编曲+钢琴起手堆叠。层层推进但克制，不炸。",
+        "search": "Morgara Desire"
+      }
+    ],
+    "worship": [
+      {
+        "id": "6-w1",
+        "song": "Seen Too Much",
+        "artist": "Bethany Wohrle",
+        "tag": "worship",
+        "tagText": "Worship",
+        "why": "7/10新专辑《REASON THAT I SING》，诗篇46篇——「你们要休息，要知道我是神」。极简钢琴+温柔女声，像一个人坐在空教堂里的祷告。Bethel Music出品。",
+        "search": "Bethany Wohrle Seen Too Much"
+      },
+      {
+        "id": "6-w2",
+        "song": "Reason That I Sing",
+        "artist": "Bethany Wohrle ft. Alexander Pappas",
+        "tag": "worship",
+        "tagText": "Worship",
+        "why": "同名专辑曲目。见证式歌词+不插电质感，和第1期被喜欢的Psalm 51同一条安静路线——不是表演是邀请。",
+        "search": "Bethany Wohrle Reason That I Sing"
+      }
+    ]
   }
 ]
